@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>OPC_USER</name>
+                <description></description>
+                <defaultValue>#OPC_USER#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>OPC_PASSWORD</name>
+                <description></description>
+                <defaultValue>HjkjfpDZZ/58OXB6bLyclh+Wm9R09kg6nE8l/7o23qE=</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>IDENTITY_DOMAIN</name>
+                <description></description>
+                <defaultValue>#IDENTITY_DOMAIN#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_IP</name>
+                <description></description>
+                <defaultValue>#DBCS_IP#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.plugins.copyartifact.CopyArtifact>
+            <projectName>archive-sshkey</projectName>
+            <filter>privateKey</filter>
+            <target></target>
+            <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+          </hudson.plugins.copyartifact.CopyArtifact>
+          <hudson.tasks.Shell>
+            <command>sh generate-storagecloud.sh</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>#!/bin/bash
+
+dbcs_ip=${DBCS_IP}
+localfile=storagecloud.sh
+remotefile=storagecloud.sh
+
+scp -o StrictHostKeyChecking=no -i privateKey $localfile oracle@${dbcs_ip}:${remotfile}
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip &quot;echo hello &gt; hello.txt; echo hello2 &gt; hello2.txt &quot;
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip \
+  &quot;sh ${remotefile} -a create_container -c mycon;
+   sh ${remotefile} -a upload_files -c mycon hello.txt hello2.txt;
+   sh ${remotefile} -a list_files -c mycon;
+  &quot;
+</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.plugins.git.GitSCM">
+          <configVersion>1</configVersion>
+          <remoteRepositories>
+            <RemoteConfig>
+              <name>origin</name>
+              <uris>
+                <org.eclipse.jgit.transport.URIish>
+                  <scheme>https</scheme>
+                  <path>/nobuhikosekiya/devcshandson201610.git</path>
+                  <rawPath>/nobuhikosekiya/devcshandson201610.git</rawPath>
+                  <port>-1</port>
+                  <host>github.com</host>
+                </org.eclipse.jgit.transport.URIish>
+              </uris>
+              <pushURIs/>
+              <fetch>
+                <org.eclipse.jgit.transport.RefSpec>
+                  <force>true</force>
+                  <wildcard>true</wildcard>
+                  <srcName>refs/heads/*</srcName>
+                  <dstName>refs/remotes/origin/*</dstName>
+                </org.eclipse.jgit.transport.RefSpec>
+              </fetch>
+              <push/>
+              <uploadpack>git-upload-pack</uploadpack>
+              <receivepack>git-receive-pack</receivepack>
+              <tagopt>AUTO_FOLLOW</tagopt>
+              <mirror>false</mirror>
+              <timeout>0</timeout>
+              <relativeTargetDir></relativeTargetDir>
+            </RemoteConfig>
+          </remoteRepositories>
+          <branches>
+            <hudson.plugins.git.BranchSpec>
+              <name>master</name>
+            </hudson.plugins.git.BranchSpec>
+          </branches>
+          <mergeOptions/>
+          <recursiveSubmodules>false</recursiveSubmodules>
+          <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+          <authorOrCommitter>false</authorOrCommitter>
+          <clean>false</clean>
+          <wipeOutWorkspace>false</wipeOutWorkspace>
+          <pruneBranches>false</pruneBranches>
+          <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+          <submoduleCfg class="list"/>
+          <includedRegions></includedRegions>
+          <excludedRegions></excludedRegions>
+          <excludedUsers></excludedUsers>
+          <gitConfigName></gitConfigName>
+          <gitConfigEmail></gitConfigEmail>
+          <skipTag>false</skipTag>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1476174336443</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+</project>

@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>IDENTITY_DOMAIN</name>
+                <description></description>
+                <defaultValue>#IDENTITY_DOMAIN#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_IP</name>
+                <description></description>
+                <defaultValue>#DBCS_IP#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_USER</name>
+                <description></description>
+                <defaultValue>#DBCS_USER#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>DBCS_USER_PASSWORD</name>
+                <description></description>
+                <defaultValue>XnyyIf18LkSNWKXVbRc472MOalsXTKvTEupJGf6hPsmE/kp/w3EnDhj1AlsLX5iS</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.tasks.Shell>
+            <command>ls -l $MIDDLEWARE_HOME_SOA_12_2_1/oracle_common/modules/oracle.jdbc
+cat &lt;&lt;EOF &gt; build.properties
+MIDDLEWARE_HOME_SOA_12_2_1=$MIDDLEWARE_HOME_SOA_12_2_1
+EOF</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>cat &lt;&lt;EOF &gt; script1.sql
+DROP TABLE DUMMY;
+CREATE TABLE DUMMY (ID NUMBER(10) );
+EOF</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>cat &lt;&lt;&apos;EOF&apos; &gt; build.xml
+&lt;?xml version=&quot;1.0&quot;?&gt;
+
+&lt;project default=&quot;main&quot; basedir=&quot;.&quot;&gt;
+  &lt;property file=&quot;build.properties&quot;/&gt;
+	&lt;path id=&quot;antclasspath&quot;&gt;
+    &lt;fileset dir=&quot;${MIDDLEWARE_HOME_SOA_12_2_1}/oracle_common/modules/oracle.jdbc&quot;&gt;
+		&lt;include name=&quot;ojdbc7.jar&quot;/&gt;
+    &lt;/fileset&gt;
+	&lt;/path&gt;
+   &lt;target name=&quot;deploy&quot;&gt;
+		&lt;sql driver=&quot;oracle.jdbc.OracleDriver&quot; userid=&quot;${DBCS_USER} as sysdba&quot; password=&quot;${DBCS_USER_PASSWORD}&quot;
+		url=&quot;jdbc:oracle:thin:@${DBCS_IP}:1521/PDB1.${IDENTITY_DOMAIN}.oraclecloud.internal&quot; src=&quot;./script1.sql&quot; 
+		classpathref=&quot;antclasspath&quot;/&gt;
+	&lt;/target&gt; 
+&lt;/project&gt;
+EOF</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Ant>
+            <targets>deploy</targets>
+            <buildFile>build.xml</buildFile>
+          </hudson.tasks.Ant>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.scm.NullSCM"/>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1476242279697</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+</project>

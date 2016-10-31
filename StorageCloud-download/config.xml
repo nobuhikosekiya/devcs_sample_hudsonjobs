@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>IDENTITY_DOMAIN</name>
+                <description></description>
+                <defaultValue>#IDENTITY_DOMAIN#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>OPC_USER</name>
+                <description></description>
+                <defaultValue>#OPC_USER#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>OPC_PASSWORD</name>
+                <description></description>
+                <defaultValue>HjkjfpDZZ/58OXB6bLyclh+Wm9R09kg6nE8l/7o23qE=</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.tasks.Shell>
+            <command>cat &lt;&lt;EOF &gt; mytext.txt
+hello
+EOF</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>USERNAME=$OPC_USER
+PASSWORD=$OPC_PASSWORD
+ID_DOMAIN=$IDENTITY_DOMAIN
+CONTAINER_NAME=testcontainer
+FILE_LIST=&quot;mytext.txt&quot;
+
+# Get Token
+curl -v -X GET -H &quot;X-Storage-User: Storage-${ID_DOMAIN}:${USERNAME}&quot; \
+-H &quot;X-Storage-Pass: ${PASSWORD}&quot; \
+--dump-header curl.out \
+https://${ID_DOMAIN}.storage.oraclecloud.com/auth/v1.0
+
+AUTH_TOKEN=`cat curl.out | grep X-Auth-Token | sed -e &quot;s/.*\: //&quot;`
+
+echo &quot;TOKEN IS $AUTH_TOKEN&quot;
+
+# Create Container
+curl -v -X PUT \
+  -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
+  https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}
+
+# Upload file
+for FILE in $FILE_LIST
+do
+  curl -v -X PUT \
+     -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
+     -T &quot;${FILE}&quot; \
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/${FILE}
+done
+
+# Check uploaded files
+  curl -v -X GET \
+     -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}
+
+
+# download file
+for FILE in $FILE_LIST
+do
+  curl -v -X GET \
+     -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
+     -o &quot;$FILE&quot; \
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/$FILE
+done
+</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.scm.NullSCM"/>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1476173948017</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+</project>

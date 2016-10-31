@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>IDENTITY_DOMAIN</name>
+                <description></description>
+                <defaultValue>#IDENTITY_DOMAIN#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>OPC_USER</name>
+                <description></description>
+                <defaultValue>#OPC_USER#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>OPC_PASSWORD</name>
+                <description></description>
+                <defaultValue>HjkjfpDZZ/58OXB6bLyclh+Wm9R09kg6nE8l/7o23qE=</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>COMPUTE_CLOUD_ENDPOINT</name>
+                <description></description>
+                <defaultValue>#COMPUTE_CLOUD_ENDPOINT#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.tasks.Shell>
+            <command>cat &lt;&lt;EOF &gt; auth.json
+{
+    &quot;user&quot;:&quot;/Compute-${IDENTITY_DOMAIN}/${OPC_USER}&quot;,
+    &quot;password&quot;:&quot;${OPC_PASSWORD}&quot;
+}
+EOF</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>curl -i -X POST \
+     --dump-header curlout \
+     -H &quot;Content-Type: application/oracle-compute-v3+json&quot; \
+     -d &quot;@auth.json&quot; \
+        ${COMPUTE_CLOUD_ENDPOINT}/authenticate/
+
+sed &quot;s/\r//g&quot;  curlout &gt; curlout.unix
+COMPUTE_COOKIE=`cat curlout.unix | grep Set-Cookie | sed -e &quot;s/.*\: //&quot;`
+echo &quot;export COMPUTE_COOKIE=&apos;$COMPUTE_COOKIE&apos;&quot; &gt; cookie
+cat cookie
+</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>source ./cookie
+curl -i -X GET \
+     -H &quot;Cookie: $COMPUTE_COOKIE&quot; \
+     -H &quot;Accept: application/oracle-compute-v3+json&quot; \
+        ${COMPUTE_CLOUD_ENDPOINT}/snapshot/Compute-${IDENTITY_DOMAIN}/${OPC_USER}/</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.scm.NullSCM"/>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1476346973376</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+</project>

@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_IP</name>
+                <description></description>
+                <defaultValue>#DBCS_IP#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_USER</name>
+                <description></description>
+                <defaultValue>#DBCS_USER#</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>DBCS_USER_PASSWORD</name>
+                <description></description>
+                <defaultValue>XnyyIf18LkSNWKXVbRc472MOalsXTKvTEupJGf6hPsmE/kp/w3EnDhj1AlsLX5iS</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.plugins.copyartifact.CopyArtifact>
+            <projectName>archive-sshkey</projectName>
+            <filter>privateKey</filter>
+            <target></target>
+            <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+          </hudson.plugins.copyartifact.CopyArtifact>
+          <hudson.tasks.Shell>
+            <command>dbcs_ip=${DBCS_IP}
+dbcs_sys=${DBCS_USER:-SYS}
+dbcs_sys_password=${DBCS_USER_PASSWORD}
+localsqlfile=awr_snap.sql
+remotesqlfile=awr_snap.sql
+
+scp -o StrictHostKeyChecking=no -i privateKey $localsqlfile oracle@${dbcs_ip}:${remotesqlfile}
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip &quot;sqlplus ${dbcs_sys}/${dbcs_sys_password}@PDB1 AS SYSDBA @${remotesqlfile}&quot;
+
+echo &quot;AWR Snapshot finished&quot;</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>dbcs_ip=${DBCS_IP}
+dbcs_sys=${DBCS_USER:-SYS}
+dbcs_sys_password=${DBCS_USER_PASSWORD}
+localsqlfile=refresh_data.sql
+remotesqlfile=refresh_data.sql
+
+scp -o StrictHostKeyChecking=no -i privateKey $localsqlfile oracle@$dbcs_ip:$remotesqlfile
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip &quot;sqlplus $dbcs_sys/$dbcs_sys_password@PDB1 AS SYSDBA @$remotesqlfile&quot;
+echo &quot;SQL execution finished&quot;</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>dbcs_ip=${DBCS_IP}
+dbcs_sys=${DBCS_USER:-SYS}
+dbcs_sys_password=${DBCS_USER_PASSWORD}
+localsqlfile=awr_snap.sql
+remotesqlfile=awr_snap.sql
+
+scp -o StrictHostKeyChecking=no -i privateKey $localsqlfile oracle@${dbcs_ip}:${remotesqlfile}
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip &quot;sqlplus ${dbcs_sys}/${dbcs_sys_password}@PDB1 AS SYSDBA @${remotesqlfile}&quot;
+echo &quot;AWR Snapshot finished&quot;</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>dbcs_ip=${DBCS_IP}
+dbcs_sys=${DBCS_USER:-SYS}
+dbcs_sys_password=${DBCS_USER_PASSWORD}
+localsqlfile=report_awr.sql
+remotesqlfile=report_awr.sql
+
+scp -o StrictHostKeyChecking=no -i privateKey $localsqlfile oracle@${dbcs_ip}:${remotesqlfile}
+ssh -o StrictHostKeyChecking=no -i privateKey oracle@$dbcs_ip &quot;sqlplus ${dbcs_sys}/${dbcs_sys_password}@PDB1 AS SYSDBA @${remotesqlfile}&quot;
+
+localsqlfile=awrsnap.html
+remotesqlfile=awrsnap.html
+
+scp -o StrictHostKeyChecking=no -i privateKey oracle@${dbcs_ip}:${remotesqlfile} $localsqlfile
+</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>hudson-tasks-ArtifactArchiver</string>
+      <external-property>
+        <originalValue class="hudson.tasks.ArtifactArchiver">
+          <artifacts>awrsnap.html</artifacts>
+          <compressionType>GZIP</compressionType>
+          <latestOnly>false</latestOnly>
+          <autoValidateFileMask>false</autoValidateFileMask>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+        <modified>false</modified>
+      </external-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.plugins.git.GitSCM">
+          <configVersion>1</configVersion>
+          <remoteRepositories>
+            <RemoteConfig>
+              <name>origin</name>
+              <uris>
+                <org.eclipse.jgit.transport.URIish>
+                  <scheme>https</scheme>
+                  <path>/nobuhikosekiya/devcshandson201610.git</path>
+                  <rawPath>/nobuhikosekiya/devcshandson201610.git</rawPath>
+                  <port>-1</port>
+                  <host>github.com</host>
+                </org.eclipse.jgit.transport.URIish>
+              </uris>
+              <pushURIs/>
+              <fetch>
+                <org.eclipse.jgit.transport.RefSpec>
+                  <force>true</force>
+                  <wildcard>true</wildcard>
+                  <srcName>refs/heads/*</srcName>
+                  <dstName>refs/remotes/origin/*</dstName>
+                </org.eclipse.jgit.transport.RefSpec>
+              </fetch>
+              <push/>
+              <uploadpack>git-upload-pack</uploadpack>
+              <receivepack>git-receive-pack</receivepack>
+              <tagopt>AUTO_FOLLOW</tagopt>
+              <mirror>false</mirror>
+              <timeout>0</timeout>
+              <relativeTargetDir></relativeTargetDir>
+            </RemoteConfig>
+          </remoteRepositories>
+          <branches>
+            <hudson.plugins.git.BranchSpec>
+              <name>master</name>
+            </hudson.plugins.git.BranchSpec>
+          </branches>
+          <mergeOptions/>
+          <recursiveSubmodules>false</recursiveSubmodules>
+          <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+          <authorOrCommitter>false</authorOrCommitter>
+          <clean>false</clean>
+          <wipeOutWorkspace>false</wipeOutWorkspace>
+          <pruneBranches>false</pruneBranches>
+          <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+          <submoduleCfg class="list"/>
+          <includedRegions></includedRegions>
+          <excludedRegions></excludedRegions>
+          <excludedUsers></excludedUsers>
+          <gitConfigName></gitConfigName>
+          <gitConfigEmail></gitConfigEmail>
+          <skipTag>false</skipTag>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1476774069997</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+</project>

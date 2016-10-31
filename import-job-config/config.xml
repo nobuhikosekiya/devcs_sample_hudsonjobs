@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.FileParameterDefinition>
+                <name>jobzip</name>
+                <description></description>
+              </hudson.model.FileParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>IDENTITY_DOMAIN</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>OPC_USER</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>OPC_PASSWORD</name>
+                <description></description>
+                <defaultValue>B9cMzoYJ77ZfwfQ1c9GLLw==</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>COMPUTE_CLOUD_ENDPOINT</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_IP</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_USER</name>
+                <description></description>
+                <defaultValue>SYS</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.PasswordParameterDefinition>
+                <name>DBCS_USER_PASSWORD</name>
+                <description></description>
+                <defaultValue>B9cMzoYJ77ZfwfQ1c9GLLw==</defaultValue>
+              </hudson.model.PasswordParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>DBCS_ENDPOINT</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.tasks.Shell>
+            <command>unzip jobzip
+
+for CONFIGXML in `find . -name config.xml`
+do
+
+if [ &quot;&quot; != &quot;${COMPUTE_CLOUD_ENDPOINT}&quot; ]; then
+  sed -i &quot;s|#COMPUTE_CLOUD_ENDPOINT#|${COMPUTE_CLOUD_ENDPOINT}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${OPC_USER}&quot; ]; then
+  sed -i &quot;s|#OPC_USER#|${OPC_USER}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${OPC_PASSWORD}&quot; ]; then
+  sed -i &quot;s|HjkjfpDZZ/58OXB6bLyclh+Wm9R09kg6nE8l/7o23qE=|${OPC_PASSWORD}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${IDENTITY_DOMAIN}&quot; ]; then
+  sed -i &quot;s|#IDENTITY_DOMAIN#|${IDENTITY_DOMAIN}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${DBCS_ENDPOINT}&quot; ]; then
+  sed -i &quot;s|#DBCS_ENDPOINT#|${DBCS_ENDPOINT}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${DBCS_IP}&quot; ]; then
+  sed -i &quot;s|#DBCS_IP#|${DBCS_IP}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${DBCS_USER_PASSWORD}&quot; ]; then
+  sed -i &quot;s|XnyyIf18LkSNWKXVbRc472MOalsXTKvTEupJGf6hPsmE/kp/w3EnDhj1AlsLX5iS|${DBCS_USER_PASSWORD}|&quot; $CONFIGXML
+fi
+
+if [ &quot;&quot; != &quot;${DBCS_USER}&quot; ]; then
+  sed -i &quot;s|#DBCS_USER#|${DBCS_USER}|&quot; $CONFIGXML
+fi
+
+done
+
+rm jobzip
+zip -r configured-jobs.zip *</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>hudson-tasks-ArtifactArchiver</string>
+      <external-property>
+        <originalValue class="hudson.tasks.ArtifactArchiver">
+          <artifacts>configured-jobs.zip</artifacts>
+          <compressionType>GZIP</compressionType>
+          <latestOnly>false</latestOnly>
+          <autoValidateFileMask>false</autoValidateFileMask>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+        <modified>false</modified>
+      </external-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.scm.NullSCM"/>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1477638362792</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+  <builders/>
+  <publishers/>
+  <buildWrappers/>
+</project>

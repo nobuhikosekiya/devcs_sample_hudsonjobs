@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <project-properties class="concurrent-hash-map">
+    <entry>
+      <string>parametersDefinitionProperties</string>
+      <copy-write-list-property>
+        <originalValue class="hudson.util.CopyOnWriteList">
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>JOB_LIST</name>
+                <description>space separated job names to export</description>
+                <defaultValue>antsql archive-sshkey awrsnap-report create-snapshot dbcs_status_check dbperformance-test1 export-jobs iaas_delete iaas_launch list-compute-instances list-snapshot refresh-data StorageCloud-download StorageCloud-downloadonDBCS import-job-config</defaultValue>
+              </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </copy-write-list-property>
+    </entry>
+    <entry>
+      <string>builders</string>
+      <describable-list-property>
+        <originalValue class="hudson.util.DescribableList">
+          <hudson.tasks.Shell>
+            <command>ELEMENT1=`echo $JOB_NAME | sed s/_.*//`
+ELEMENT2=`echo $JOB_NAME | sed s/\\\..*//`
+ELEMENT3=`echo $JOB_NAME | sed s@\export-jobs@@`
+
+for JOB in `echo $JOB_LIST`
+do
+  mkdir $JOB
+  curl -o $JOB/config.xml ${HUDSON_URL}profile/$ELEMENT1/s/$ELEMENT2/hudson/job/${ELEMENT3}${JOB}/config.xml
+
+done</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>for CONFIGXML in `find . -name config.xml`
+do
+   sed -i &quot;s|&lt;projectName&gt;developer.*archive-sshkey&lt;/projectName&gt;|&lt;projectName&gt;archive-sshkey&lt;/projectName&gt;|&quot; $CONFIGXML
+done</command>
+          </hudson.tasks.Shell>
+          <hudson.tasks.Shell>
+            <command>jar -cvfM jobs.zip */config.xml
+</command>
+          </hudson.tasks.Shell>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+      </describable-list-property>
+    </entry>
+    <entry>
+      <string>hudson-tasks-ArtifactArchiver</string>
+      <external-property>
+        <originalValue class="hudson.tasks.ArtifactArchiver">
+          <artifacts>jobs.zip</artifacts>
+          <compressionType>GZIP</compressionType>
+          <latestOnly>false</latestOnly>
+          <autoValidateFileMask>false</autoValidateFileMask>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+        <modified>false</modified>
+      </external-property>
+    </entry>
+    <entry>
+      <string>scm</string>
+      <scm-property>
+        <originalValue class="hudson.scm.NullSCM"/>
+        <propertyOverridden>false</propertyOverridden>
+      </scm-property>
+    </entry>
+  </project-properties>
+  <keepDependencies>false</keepDependencies>
+  <createdBy>lisa.jones</createdBy>
+  <creationTime>1477618891070</creationTime>
+  <properties/>
+  <cascadingChildrenNames class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <cascading-job-properties class="java.util.concurrent.CopyOnWriteArraySet"/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <cleanWorkspaceRequired>false</cleanWorkspaceRequired>
+  <builders/>
+  <publishers/>
+  <buildWrappers/>
+</project>
