@@ -39,32 +39,45 @@
       <describable-list-property>
         <originalValue class="hudson.util.DescribableList">
           <hudson.tasks.Shell>
-            <command>cat &lt;&lt;EOF &gt; auth.json
+            <command>set -eu
+
+cat &lt;&lt;EOF &gt; auth.json
 {
     &quot;user&quot;:&quot;/Compute-${IDENTITY_DOMAIN}/${OPC_USER}&quot;,
     &quot;password&quot;:&quot;${OPC_PASSWORD}&quot;
 }
-EOF</command>
-          </hudson.tasks.Shell>
-          <hudson.tasks.Shell>
-            <command>curl -i -X POST \
-     --dump-header curlout \
+EOF
+
+HTTP_CODE=`curl -i -X POST \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
      -H &quot;Content-Type: application/oracle-compute-v3+json&quot; \
      -d &quot;@auth.json&quot; \
-        ${COMPUTE_CLOUD_ENDPOINT}/authenticate/
+        ${COMPUTE_CLOUD_ENDPOINT}/authenticate/`
+        
+if [ &quot;$HTTP_CODE&quot; -ne &quot;204&quot; ]; then
+  cat header.out
+  exit 1
+fi
 
-sed &quot;s/\r//g&quot;  curlout &gt; curlout.unix
-COMPUTE_COOKIE=`cat curlout.unix | grep Set-Cookie | sed -e &quot;s/.*\: //&quot;`
-echo &quot;export COMPUTE_COOKIE=&apos;$COMPUTE_COOKIE&apos;&quot; &gt; cookie
-cat cookie
-</command>
+sed &quot;s/\r//g&quot;  header.out &gt; header.out.unix
+COMPUTE_COOKIE=`cat header.out.unix | grep Set-Cookie | sed -e &quot;s/.*\: //&quot;`
+echo &quot;export COMPUTE_COOKIE=&apos;$COMPUTE_COOKIE&apos;&quot; &gt; cookie</command>
           </hudson.tasks.Shell>
           <hudson.tasks.Shell>
-            <command>source ./cookie
-curl -i -X GET \
+            <command>set -eu
+
+source ./cookie
+HTTP_CODE=`curl -i -X GET \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
      -H &quot;Cookie: $COMPUTE_COOKIE&quot; \
      -H &quot;Accept: application/oracle-compute-v3+json&quot; \
-        ${COMPUTE_CLOUD_ENDPOINT}/snapshot/Compute-${IDENTITY_DOMAIN}/${OPC_USER}/</command>
+     ${COMPUTE_CLOUD_ENDPOINT}/snapshot/Compute-${IDENTITY_DOMAIN}/${OPC_USER}/`
+        
+if [ &quot;$HTTP_CODE&quot; -ne &quot;200&quot; ]; then
+  cat header.out
+  exit 1
+fi
+cat curl.out</command>
           </hudson.tasks.Shell>
         </originalValue>
         <propertyOverridden>false</propertyOverridden>

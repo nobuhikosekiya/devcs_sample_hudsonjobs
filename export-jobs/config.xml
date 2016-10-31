@@ -11,7 +11,7 @@
               <hudson.model.StringParameterDefinition>
                 <name>JOB_LIST</name>
                 <description>space separated job names to export</description>
-                <defaultValue>antsql archive-sshkey awrsnap-report create-snapshot dbcs_status_check dbperformance-test1 export-jobs iaas_delete iaas_launch list-compute-instances list-snapshot refresh-data StorageCloud-download StorageCloud-downloadonDBCS import-job-config</defaultValue>
+                <defaultValue>antsql archive-sshkey awrsnap-report create-snapshot dbcs_status_check dbperformance-test1 export-jobs iaas_delete iaas_launch list-compute-instances list-snapshot refresh-data StorageCloud-download StorageCloud-downloadonDBCS configure-exported-jobs</defaultValue>
               </hudson.model.StringParameterDefinition>
             </parameterDefinitions>
           </hudson.model.ParametersDefinitionProperty>

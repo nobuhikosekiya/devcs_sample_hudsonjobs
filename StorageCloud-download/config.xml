@@ -34,8 +34,12 @@
       <describable-list-property>
         <originalValue class="hudson.util.DescribableList">
           <hudson.tasks.Shell>
-            <command>cat &lt;&lt;EOF &gt; mytext.txt
-hello
+            <command>cat &lt;&lt;EOF &gt; mytext1.txt
+hello1
+EOF
+
+cat &lt;&lt;EOF &gt; mytext2.txt
+hello1
 EOF</command>
           </hudson.tasks.Shell>
           <hudson.tasks.Shell>
@@ -43,51 +47,95 @@ EOF</command>
 PASSWORD=$OPC_PASSWORD
 ID_DOMAIN=$IDENTITY_DOMAIN
 CONTAINER_NAME=testcontainer
-FILE_LIST=&quot;mytext.txt&quot;
+FILE_LIST=&quot;mytext1.txt mytext2.txt&quot;
 
 # Get Token
-curl -v -X GET -H &quot;X-Storage-User: Storage-${ID_DOMAIN}:${USERNAME}&quot; \
--H &quot;X-Storage-Pass: ${PASSWORD}&quot; \
---dump-header curl.out \
-https://${ID_DOMAIN}.storage.oraclecloud.com/auth/v1.0
+HTTP_CODE=`curl -i -X GET \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
+     -H &quot;X-Storage-User: Storage-${ID_DOMAIN}:${USERNAME}&quot; \
+     -H &quot;X-Storage-Pass: ${PASSWORD}&quot; \
+     https://${ID_DOMAIN}.storage.oraclecloud.com/auth/v1.0`
 
-AUTH_TOKEN=`cat curl.out | grep X-Auth-Token | sed -e &quot;s/.*\: //&quot;`
+if [ &quot;$HTTP_CODE&quot; -ne &quot;200&quot; ]; then
+  cat header.out
+  exit 1
+fi
+
+AUTH_TOKEN=`cat header.out | grep X-Auth-Token | sed -e &quot;s/.*\: //&quot;`
 
 echo &quot;TOKEN IS $AUTH_TOKEN&quot;
 
 # Create Container
-curl -v -X PUT \
-  -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
-  https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}
+HTTP_CODE=`curl -i -X PUT \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
+     -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}`
+
+if [ &quot;$HTTP_CODE&quot; -ne &quot;201&quot; -a &quot;$HTTP_CODE&quot; -ne &quot;202&quot; ]; then
+  cat header.out
+  exit 1
+fi
 
 # Upload file
 for FILE in $FILE_LIST
 do
-  curl -v -X PUT \
+  HTTP_CODE=`curl -i -X PUT \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
      -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
      -T &quot;${FILE}&quot; \
-     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/${FILE}
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/uploaded-${FILE}`
+
+    if [ &quot;$HTTP_CODE&quot; -ne &quot;201&quot; -a &quot;$HTTP_CODE&quot; -ne &quot;202&quot; ]; then
+      cat header.out
+      exit 1
+    fi
 done
 
 # Check uploaded files
-  curl -v -X GET \
+HTTP_CODE=`curl -X GET \
+     -s -o curl.out -w &apos;%{http_code}&apos; --dump-header header.out \
      -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
-     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}`
 
-
+if [ &quot;$HTTP_CODE&quot; -ne &quot;200&quot; ]; then
+  cat header.out
+  exit 1
+fi
+FILE_LIST=`cat curl.out`
+    
 # download file
 for FILE in $FILE_LIST
 do
-  curl -v -X GET \
+     HTTP_CODE=`curl -X GET \
+     -s -w &apos;%{http_code}&apos; --dump-header header.out \
      -H &quot;X-Auth-Token: $AUTH_TOKEN&quot; \
      -o &quot;$FILE&quot; \
-     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/$FILE
+     https://${ID_DOMAIN}.storage.oraclecloud.com/v1/Storage-${ID_DOMAIN}/${CONTAINER_NAME}/$FILE`
+     
+    if [ &quot;$HTTP_CODE&quot; -ne &quot;200&quot; ]; then
+      cat header.out
+      exit 1
+    fi
+
 done
 </command>
           </hudson.tasks.Shell>
         </originalValue>
         <propertyOverridden>false</propertyOverridden>
       </describable-list-property>
+    </entry>
+    <entry>
+      <string>hudson-tasks-ArtifactArchiver</string>
+      <external-property>
+        <originalValue class="hudson.tasks.ArtifactArchiver">
+          <artifacts>uploaded*</artifacts>
+          <compressionType>GZIP</compressionType>
+          <latestOnly>false</latestOnly>
+          <autoValidateFileMask>false</autoValidateFileMask>
+        </originalValue>
+        <propertyOverridden>false</propertyOverridden>
+        <modified>false</modified>
+      </external-property>
     </entry>
     <entry>
       <string>scm</string>

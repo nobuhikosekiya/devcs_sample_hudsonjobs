@@ -51,7 +51,8 @@ CREATE TABLE DUMMY (ID NUMBER(10) );
 EOF</command>
           </hudson.tasks.Shell>
           <hudson.tasks.Shell>
-            <command>cat &lt;&lt;&apos;EOF&apos; &gt; build.xml
+            <command># look at https://ant.apache.org/manual/Tasks/sql.html for help
+cat &lt;&lt;&apos;EOF&apos; &gt; build.xml
 &lt;?xml version=&quot;1.0&quot;?&gt;
 
 &lt;project default=&quot;main&quot; basedir=&quot;.&quot;&gt;
@@ -64,7 +65,7 @@ EOF</command>
    &lt;target name=&quot;deploy&quot;&gt;
 		&lt;sql driver=&quot;oracle.jdbc.OracleDriver&quot; userid=&quot;${DBCS_USER} as sysdba&quot; password=&quot;${DBCS_USER_PASSWORD}&quot;
 		url=&quot;jdbc:oracle:thin:@${DBCS_IP}:1521/PDB1.${IDENTITY_DOMAIN}.oraclecloud.internal&quot; src=&quot;./script1.sql&quot; 
-		classpathref=&quot;antclasspath&quot;/&gt;
+		classpathref=&quot;antclasspath&quot; print=&quot;true&quot;/&gt;
 	&lt;/target&gt; 
 &lt;/project&gt;
 EOF</command>
